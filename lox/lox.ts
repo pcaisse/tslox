@@ -1,4 +1,5 @@
-import Scanner, { ScannerError } from "./scanner";
+import Parser from "./parser";
+import Scanner from "./scanner";
 
 export default class Lox {
   #hadError = false;
@@ -31,22 +32,12 @@ export default class Lox {
   }
 
   #run(source: string): void {
-    const scanner = new Scanner(source);
-    try {
-      for (const token of scanner.scanTokens()) {
-        console.log(token);
-      }
-    } catch (error) {
-      if (error instanceof ScannerError) {
-        this.#error(error.line, error.message);
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  #error(line: number, message: string): void {
-    this.#report(line, "", message);
+    const scanner = new Scanner(source, this.#report);
+    const tokens = scanner.scanTokens();
+    const parser = new Parser(tokens, this.#report);
+    const expression = parser.parse();
+    if (this.#hadError) return;
+    console.log("expression", expression);
   }
 
   #report(line: number, where: string, message: string): void {

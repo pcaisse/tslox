@@ -1,17 +1,17 @@
 import Token from "./token";
 
 interface Visitor {
-  visitBinary: (binary: Binary) => void;
-  visitGrouping: (grouping: Grouping) => void;
-  visitLiteral: (literal: Literal) => void;
-  visitUnary: (unary: Unary) => void;
+  visitBinary: (binary: BinaryExpr) => void;
+  visitGrouping: (grouping: GroupingExpr) => void;
+  visitLiteral: (literal: LiteralExpr) => void;
+  visitUnary: (unary: UnaryExpr) => void;
 }
 
-abstract class Expr {
+export abstract class Expr {
   abstract accept: (visitor: Visitor) => void;
 }
 
-export class Binary implements Expr {
+export class BinaryExpr implements Expr {
   left: Expr;
   operator: Token;
   right: Expr;
@@ -27,7 +27,7 @@ export class Binary implements Expr {
   }
 }
 
-export class Grouping implements Expr {
+export class GroupingExpr implements Expr {
   expression: Expr;
 
   constructor(expression: Expr) {
@@ -39,10 +39,10 @@ export class Grouping implements Expr {
   }
 }
 
-export class Literal implements Expr {
-  value: object;
+export class LiteralExpr implements Expr {
+  value: string | number | boolean | null;
 
-  constructor(value: object) {
+  constructor(value: string | number | boolean | null) {
     this.value = value;
   }
 
@@ -51,7 +51,7 @@ export class Literal implements Expr {
   }
 }
 
-export class Unary implements Expr {
+export class UnaryExpr implements Expr {
   operator: Token;
   right: Expr;
 

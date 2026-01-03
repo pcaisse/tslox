@@ -1,17 +1,9 @@
 import Token from "./token";
 import { TokenType } from "./tokenType";
 
-export class ScannerError extends Error {
-  line: number;
-  constructor(message: string, line: number) {
-    super(message);
-    this.name = "ScannerError";
-    this.line = line;
-  }
-}
-
 export default class Scanner {
   #source: string;
+  #report: (line: number, where: string, message: string) => void;
   #tokens: Token[] = [];
   #start = 0;
   #current = 0;
@@ -36,8 +28,12 @@ export default class Scanner {
     ["while", TokenType.WHILE],
   ]);
 
-  constructor(source: string) {
+  constructor(
+    source: string,
+    report: (line: number, where: string, message: string) => void,
+  ) {
     this.#source = source;
+    this.#report = report;
   }
 
   scanTokens(): Token[] {
@@ -130,7 +126,7 @@ export default class Scanner {
         } else if (this.#isAlpha(c)) {
           this.#identifier();
         } else {
-          throw new ScannerError("Unexpected character.", this.#line);
+          this.#report(this.#line, "", "Unexpected character.");
         }
         break;
     }
@@ -171,7 +167,8 @@ export default class Scanner {
     }
 
     if (this.#isAtEnd()) {
-      throw new ScannerError("Unterminated string.", this.#line);
+      this.#report(this.#line, "", "Unterminated string.");
+      return;
     }
 
     // The closing ".
