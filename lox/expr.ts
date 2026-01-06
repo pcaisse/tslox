@@ -1,14 +1,15 @@
 import Token from "./token";
+import type { Literal } from "./types";
 
-interface Visitor {
-  visitBinary: (binary: BinaryExpr) => void;
-  visitGrouping: (grouping: GroupingExpr) => void;
-  visitLiteral: (literal: LiteralExpr) => void;
-  visitUnary: (unary: UnaryExpr) => void;
+export interface Visitor {
+  visitBinaryExpr: (binary: BinaryExpr) => Literal;
+  visitGroupingExpr: (grouping: GroupingExpr) => Literal;
+  visitLiteralExpr: (literal: LiteralExpr) => Literal;
+  visitUnaryExpr: (unary: UnaryExpr) => Literal;
 }
 
 export abstract class Expr {
-  abstract accept: (visitor: Visitor) => void;
+  abstract accept: (visitor: Visitor) => Literal;
 }
 
 export class BinaryExpr implements Expr {
@@ -22,8 +23,8 @@ export class BinaryExpr implements Expr {
     this.right = right;
   }
 
-  accept(visitor: Visitor): void {
-    visitor.visitBinary(this);
+  accept(visitor: Visitor): Literal {
+    return visitor.visitBinaryExpr(this);
   }
 }
 
@@ -34,20 +35,20 @@ export class GroupingExpr implements Expr {
     this.expression = expression;
   }
 
-  accept(visitor: Visitor): void {
-    visitor.visitGrouping(this);
+  accept(visitor: Visitor): Literal {
+    return visitor.visitGroupingExpr(this);
   }
 }
 
 export class LiteralExpr implements Expr {
-  value: string | number | boolean | null;
+  value: Literal;
 
-  constructor(value: string | number | boolean | null) {
+  constructor(value: Literal) {
     this.value = value;
   }
 
-  accept(visitor: Visitor): void {
-    visitor.visitLiteral(this);
+  accept(visitor: Visitor): Literal {
+    return visitor.visitLiteralExpr(this);
   }
 }
 
@@ -60,7 +61,7 @@ export class UnaryExpr implements Expr {
     this.right = right;
   }
 
-  accept(visitor: Visitor): void {
-    visitor.visitUnary(this);
+  accept(visitor: Visitor): Literal {
+    return visitor.visitUnaryExpr(this);
   }
 }
