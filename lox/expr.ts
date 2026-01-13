@@ -1,7 +1,7 @@
 import Token from "./token";
 import type { Literal } from "./types";
 
-export interface Visitor {
+export interface VisitorExpr {
   visitBinaryExpr: (binary: BinaryExpr) => Literal;
   visitGroupingExpr: (grouping: GroupingExpr) => Literal;
   visitLiteralExpr: (literal: LiteralExpr) => Literal;
@@ -9,7 +9,7 @@ export interface Visitor {
 }
 
 export abstract class Expr {
-  abstract accept: (visitor: Visitor) => Literal;
+  abstract accept: (visitor: VisitorExpr) => Literal;
 }
 
 export class BinaryExpr implements Expr {
@@ -23,7 +23,7 @@ export class BinaryExpr implements Expr {
     this.right = right;
   }
 
-  accept(visitor: Visitor): Literal {
+  accept(visitor: VisitorExpr): Literal {
     return visitor.visitBinaryExpr(this);
   }
 }
@@ -35,7 +35,7 @@ export class GroupingExpr implements Expr {
     this.expression = expression;
   }
 
-  accept(visitor: Visitor): Literal {
+  accept(visitor: VisitorExpr): Literal {
     return visitor.visitGroupingExpr(this);
   }
 }
@@ -47,7 +47,7 @@ export class LiteralExpr implements Expr {
     this.value = value;
   }
 
-  accept(visitor: Visitor): Literal {
+  accept(visitor: VisitorExpr): Literal {
     return visitor.visitLiteralExpr(this);
   }
 }
@@ -61,7 +61,7 @@ export class UnaryExpr implements Expr {
     this.right = right;
   }
 
-  accept(visitor: Visitor): Literal {
+  accept(visitor: VisitorExpr): Literal {
     return visitor.visitUnaryExpr(this);
   }
 }

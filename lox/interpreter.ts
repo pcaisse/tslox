@@ -5,7 +5,7 @@ import type {
   GroupingExpr,
   LiteralExpr,
   UnaryExpr,
-  Visitor,
+  VisitorExpr,
 } from "./expr";
 import { TokenType } from "./tokenType";
 import type { Literal } from "./types";
@@ -19,7 +19,7 @@ export class RuntimeError extends Error {
   }
 }
 
-export default class Interpreter implements Visitor {
+export default class Interpreter implements VisitorExpr {
   runtimeError: (error: RuntimeError) => void;
 
   constructor(runtimeError: (error: RuntimeError) => void) {
