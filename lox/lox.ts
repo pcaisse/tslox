@@ -39,10 +39,9 @@ export default class Lox {
     const scanner = new Scanner(source, this.#error);
     const tokens = scanner.scanTokens();
     const parser = new Parser(tokens, this.#error);
-    const expression = parser.parse();
+    const statements = parser.parse();
     if (this.#hadError) return;
-    if (expression === null) return;
-    this.interpreter.interpret(expression);
+    this.interpreter.interpret(statements);
   }
 
   #error(line: number, where: string, message: string): void {

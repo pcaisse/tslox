@@ -139,8 +139,6 @@ export default class Scanner {
     let type = this.#keywords.get(text);
     if (type === undefined) type = TokenType.IDENTIFIER;
     this.#addToken(type);
-
-    this.#addToken(TokenType.IDENTIFIER);
   }
 
   #number(): void {

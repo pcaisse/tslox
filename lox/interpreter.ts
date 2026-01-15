@@ -9,6 +9,7 @@ import type {
 } from "./expr";
 import { TokenType } from "./tokenType";
 import type { Literal } from "./types";
+import type { ExprStmt, PrintStmt, Stmt, VisitorStmt } from "./stmt";
 
 export class RuntimeError extends Error {
   token: Token;
@@ -19,17 +20,18 @@ export class RuntimeError extends Error {
   }
 }
 
-export default class Interpreter implements VisitorExpr {
+export default class Interpreter implements VisitorExpr, VisitorStmt {
   runtimeError: (error: RuntimeError) => void;
 
   constructor(runtimeError: (error: RuntimeError) => void) {
     this.runtimeError = runtimeError;
   }
 
-  interpret(expression: Expr): void {
+  interpret(statements: Stmt[]): void {
     try {
-      const value = this.#evaluate(expression);
-      console.log(value);
+      for (const statement of statements) {
+        this.#execute(statement);
+      }
     } catch (error) {
       if (error instanceof RuntimeError) this.runtimeError(error);
     }
@@ -117,6 +119,19 @@ export default class Interpreter implements VisitorExpr {
 
   #evaluate(expr: Expr): Literal {
     return expr.accept(this);
+  }
+
+  #execute(statement: Stmt) {
+    statement.accept(this);
+  }
+
+  visitExprStmt(stmt: ExprStmt): void {
+    this.#evaluate(stmt.expression);
+  }
+
+  visitPrintStmt(stmt: PrintStmt): void {
+    const value = this.#evaluate(stmt.expression);
+    console.log(value);
   }
 
   #isTruthy(literal: Literal): boolean {

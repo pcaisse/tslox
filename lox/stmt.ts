@@ -1,13 +1,12 @@
 import type { Expr } from "./expr";
-import type { Literal } from "./types";
 
 export interface VisitorStmt {
-  visitExprStmt: (stmt: ExprStmt) => Literal;
-  visitPrintStmt: (stmt: PrintStmt) => Literal;
+  visitExprStmt: (stmt: ExprStmt) => void;
+  visitPrintStmt: (stmt: PrintStmt) => void;
 }
 
 export abstract class Stmt {
-  abstract accept: (visitor: VisitorStmt) => Literal;
+  abstract accept: (visitor: VisitorStmt) => void;
 }
 
 export class ExprStmt implements Stmt {
@@ -17,7 +16,7 @@ export class ExprStmt implements Stmt {
     this.expression = expression;
   }
 
-  accept(visitor: VisitorStmt): Literal {
+  accept(visitor: VisitorStmt): void {
     return visitor.visitExprStmt(this);
   }
 }
@@ -29,7 +28,7 @@ export class PrintStmt implements Stmt {
     this.expression = expression;
   }
 
-  accept(visitor: VisitorStmt): Literal {
+  accept(visitor: VisitorStmt): void {
     return visitor.visitPrintStmt(this);
   }
 }
