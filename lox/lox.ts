@@ -29,9 +29,10 @@ export default class Lox {
   }
 
   async #runPrompt() {
-    console.log("> ");
+    Bun.stdout.write("> ");
     for await (const input of console) {
       this.#run(input);
+      Bun.stdout.write("> ");
     }
   }
 
