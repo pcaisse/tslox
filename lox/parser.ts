@@ -1,7 +1,14 @@
 import Token from "./token";
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr } from "./expr";
+import {
+  BinaryExpr,
+  Expr,
+  GroupingExpr,
+  LiteralExpr,
+  UnaryExpr,
+  VariableExpr,
+} from "./expr";
 import { TokenType } from "./tokenType";
-import { ExprStmt, PrintStmt, type Stmt } from "./stmt";
+import { ExprStmt, PrintStmt, VarStmt, type Stmt } from "./stmt";
 
 export class ParseError extends Error {
   token: Token;
@@ -28,13 +35,23 @@ export default class Parser {
   parse(): Stmt[] {
     let statements: Stmt[] = [];
     while (!this.#isAtEnd()) {
-      statements.push(this.#statement());
+      statements.push(this.#declaration());
     }
     return statements;
   }
 
   #expression(): Expr {
     return this.#equality();
+  }
+
+  #declaration(): Stmt {
+    try {
+      if (this.#match(TokenType.VAR)) return this.#varDeclaration();
+      return this.#statement();
+    } catch (error) {
+      if (error instanceof ParseError) this.#synchronize();
+      throw error;
+    }
   }
 
   #statement(): Stmt {
@@ -46,6 +63,19 @@ export default class Parser {
     const value: Expr = this.#expression();
     this.#consume(TokenType.SEMICOLON, "Expect ';' after value.");
     return new PrintStmt(value);
+  }
+
+  #varDeclaration(): VarStmt {
+    const name: Token = this.#consume(
+      TokenType.IDENTIFIER,
+      "Expect variable name.",
+    );
+    const initializer = this.#match(TokenType.EQUAL)
+      ? this.#expression()
+      : null;
+
+    this.#consume(TokenType.SEMICOLON, "Expect ';' after variable declaration");
+    return new VarStmt(name, initializer);
   }
 
   #expressionStatement(): ExprStmt {
@@ -126,6 +156,10 @@ export default class Parser {
 
     if (this.#match(TokenType.NUMBER, TokenType.STRING)) {
       return new LiteralExpr(this.#previous().literal);
+    }
+
+    if (this.#match(TokenType.IDENTIFIER)) {
+      return new VariableExpr(this.#previous());
     }
 
     if (this.#match(TokenType.LEFT_PAREN)) {
