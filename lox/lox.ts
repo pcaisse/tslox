@@ -4,8 +4,8 @@ import Scanner from "./scanner";
 
 export default class Lox {
   interpreter = new Interpreter(this.#runtimeError);
-  #hadError = false;
-  #hadRuntimeError = false;
+  hadError = false;
+  hadRuntimeError = false;
 
   constructor() {
     if (arguments.length > 1) {
@@ -24,8 +24,8 @@ export default class Lox {
     this.#run(text);
 
     // Indicate an error in the exit code.
-    if (this.#hadError) process.exit(65);
-    if (this.#hadRuntimeError) process.exit(70);
+    if (this.hadError) process.exit(65);
+    if (this.hadRuntimeError) process.exit(70);
   }
 
   async #runPrompt() {
@@ -40,17 +40,17 @@ export default class Lox {
     const tokens = scanner.scanTokens();
     const parser = new Parser(tokens, this.#error);
     const statements = parser.parse();
-    if (this.#hadError) return;
+    if (this.hadError) return;
     this.interpreter.interpret(statements);
   }
 
   #error(line: number, where: string, message: string): void {
     console.error("[line " + line + "] Error" + where + ": " + message);
-    this.#hadError = true;
+    this.hadError = true;
   }
 
   #runtimeError(error: RuntimeError) {
     console.error(error.message + "\n[line " + error.token.line + "]");
-    this.#hadRuntimeError = true;
+    this.hadRuntimeError = true;
   }
 }
