@@ -5,11 +5,13 @@ import type {
   GroupingExpr,
   LiteralExpr,
   UnaryExpr,
+  VariableExpr,
   VisitorExpr,
 } from "./expr";
 import { TokenType } from "./tokenType";
 import type { Literal } from "./types";
-import type { ExprStmt, PrintStmt, Stmt, VisitorStmt } from "./stmt";
+import type { ExprStmt, PrintStmt, Stmt, VarStmt, VisitorStmt } from "./stmt";
+import Environment from "./environment";
 
 export class RuntimeError extends Error {
   token: Token;
@@ -21,6 +23,7 @@ export class RuntimeError extends Error {
 }
 
 export default class Interpreter implements VisitorExpr, VisitorStmt {
+  #environment: Environment = new Environment();
   runtimeError: (error: RuntimeError) => void;
 
   constructor(runtimeError: (error: RuntimeError) => void) {
@@ -107,6 +110,10 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
     return null;
   }
 
+  visitVariableExpr(expr: VariableExpr): Literal {
+    return this.#environment.get(expr.name);
+  }
+
   #checkNumberOperand(operator: Token, operand: Literal) {
     if (typeof operand === "number") return;
     throw new RuntimeError("Operand must be a number.", operator);
@@ -132,6 +139,12 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
   visitPrintStmt(stmt: PrintStmt): void {
     const value = this.#evaluate(stmt.expression);
     console.log(value);
+  }
+
+  visitVarStmt(stmt: VarStmt): void {
+    const value =
+      stmt.initializer !== null ? this.#evaluate(stmt.initializer) : null;
+    this.#environment.define(stmt.name.lexeme, value);
   }
 
   #isTruthy(literal: Literal): boolean {
