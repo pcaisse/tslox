@@ -16,4 +16,12 @@ export default class Environment {
     }
     return value;
   }
+
+  assign(name: Token, value: Literal): void {
+    if (this.#values.has(name.lexeme)) {
+      this.#values.set(name.lexeme, value);
+      return;
+    }
+    throw new RuntimeError("Undefined variable '" + name.lexeme + "'.", name);
+  }
 }

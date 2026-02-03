@@ -2,6 +2,7 @@ import Token from "./token";
 import type { Literal } from "./types";
 
 export interface VisitorExpr {
+  visitAssignExpr: (assign: AssignExpr) => Literal;
   visitBinaryExpr: (binary: BinaryExpr) => Literal;
   visitGroupingExpr: (grouping: GroupingExpr) => Literal;
   visitLiteralExpr: (literal: LiteralExpr) => Literal;
@@ -11,6 +12,20 @@ export interface VisitorExpr {
 
 export abstract class Expr {
   abstract accept: (visitor: VisitorExpr) => Literal;
+}
+
+export class AssignExpr implements Expr {
+  name: Token;
+  value: Expr;
+
+  constructor(name: Token, value: Expr) {
+    this.name = name;
+    this.value = value;
+  }
+
+  accept(visitor: VisitorExpr): Literal {
+    return visitor.visitAssignExpr(this);
+  }
 }
 
 export class BinaryExpr implements Expr {

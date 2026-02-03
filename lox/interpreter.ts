@@ -1,5 +1,6 @@
 import Token from "./token";
 import type {
+  AssignExpr,
   BinaryExpr,
   Expr,
   GroupingExpr,
@@ -145,6 +146,12 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
     const value =
       stmt.initializer !== null ? this.#evaluate(stmt.initializer) : null;
     this.#environment.define(stmt.name.lexeme, value);
+  }
+
+  visitAssignExpr(expr: AssignExpr): Literal {
+    const value = this.#evaluate(expr.value);
+    this.#environment.assign(expr.name, value);
+    return value;
   }
 
   #isTruthy(literal: Literal): boolean {

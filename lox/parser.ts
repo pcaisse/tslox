@@ -1,5 +1,6 @@
 import Token from "./token";
 import {
+  AssignExpr,
   BinaryExpr,
   Expr,
   GroupingExpr,
@@ -41,7 +42,7 @@ export default class Parser {
   }
 
   #expression(): Expr {
-    return this.#equality();
+    return this.#assignment();
   }
 
   #declaration(): Stmt {
@@ -82,6 +83,24 @@ export default class Parser {
     const expression: Expr = this.#expression();
     this.#consume(TokenType.SEMICOLON, "Expect ';' after expression.");
     return new ExprStmt(expression);
+  }
+
+  #assignment(): Expr {
+    const expr = this.#equality();
+
+    if (this.#match(TokenType.EQUAL)) {
+      const equals = this.#previous();
+      const value = this.#assignment();
+
+      if (expr instanceof VariableExpr) {
+        const name = expr.name;
+        return new AssignExpr(name, value);
+      }
+
+      this.#error(equals, "Invalid assignment target.");
+    }
+
+    return expr;
   }
 
   #equality(): Expr {
