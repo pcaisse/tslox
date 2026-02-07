@@ -9,7 +9,7 @@ import {
   VariableExpr,
 } from "./expr";
 import { TokenType } from "./tokenType";
-import { ExprStmt, PrintStmt, VarStmt, type Stmt } from "./stmt";
+import { BlockStmt, ExprStmt, PrintStmt, VarStmt, type Stmt } from "./stmt";
 
 export class ParseError extends Error {
   token: Token;
@@ -57,6 +57,7 @@ export default class Parser {
 
   #statement(): Stmt {
     if (this.#match(TokenType.PRINT)) return this.#printStatement();
+    if (this.#match(TokenType.LEFT_BRACE)) return new BlockStmt(this.#block());
     return this.#expressionStatement();
   }
 
@@ -83,6 +84,15 @@ export default class Parser {
     const expression: Expr = this.#expression();
     this.#consume(TokenType.SEMICOLON, "Expect ';' after expression.");
     return new ExprStmt(expression);
+  }
+
+  #block(): Stmt[] {
+    const statements: Stmt[] = [];
+    while (!this.#check(TokenType.RIGHT_BRACE) && !this.#isAtEnd()) {
+      statements.push(this.#declaration());
+    }
+    this.#consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+    return statements;
   }
 
   #assignment(): Expr {

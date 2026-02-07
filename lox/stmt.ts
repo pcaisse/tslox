@@ -5,6 +5,7 @@ export interface VisitorStmt {
   visitExprStmt: (stmt: ExprStmt) => void;
   visitPrintStmt: (stmt: PrintStmt) => void;
   visitVarStmt: (stmt: VarStmt) => void;
+  visitBlockStmt: (stmt: BlockStmt) => void;
 }
 
 export abstract class Stmt {
@@ -46,5 +47,17 @@ export class VarStmt implements Stmt {
 
   accept(visitor: VisitorStmt): void {
     return visitor.visitVarStmt(this);
+  }
+}
+
+export class BlockStmt implements Stmt {
+  statements: Stmt[];
+
+  constructor(statements: Stmt[]) {
+    this.statements = statements;
+  }
+
+  accept(visitor: VisitorStmt): void {
+    return visitor.visitBlockStmt(this);
   }
 }

@@ -11,7 +11,14 @@ import type {
 } from "./expr";
 import { TokenType } from "./tokenType";
 import type { Literal } from "./types";
-import type { ExprStmt, PrintStmt, Stmt, VarStmt, VisitorStmt } from "./stmt";
+import type {
+  BlockStmt,
+  ExprStmt,
+  PrintStmt,
+  Stmt,
+  VarStmt,
+  VisitorStmt,
+} from "./stmt";
 import Environment from "./environment";
 
 export class RuntimeError extends Error {
@@ -131,6 +138,22 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
 
   #execute(statement: Stmt) {
     statement.accept(this);
+  }
+
+  #executeBlock(statements: Stmt[], environment: Environment): void {
+    const previous = this.#environment;
+    try {
+      this.#environment = environment;
+      for (const statement of statements) {
+        this.#execute(statement);
+      }
+    } finally {
+      this.#environment = previous;
+    }
+  }
+
+  visitBlockStmt(stmt: BlockStmt): void {
+    this.#executeBlock(stmt.statements, new Environment(this.#environment));
   }
 
   visitExprStmt(stmt: ExprStmt): void {
