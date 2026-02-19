@@ -6,6 +6,7 @@ export interface VisitorStmt {
   visitPrintStmt: (stmt: PrintStmt) => void;
   visitVarStmt: (stmt: VarStmt) => void;
   visitBlockStmt: (stmt: BlockStmt) => void;
+  visitIfStmt: (stmt: IfStmt) => void;
 }
 
 export abstract class Stmt {
@@ -59,5 +60,21 @@ export class BlockStmt implements Stmt {
 
   accept(visitor: VisitorStmt): void {
     return visitor.visitBlockStmt(this);
+  }
+}
+
+export class IfStmt implements Stmt {
+  condition: Expr;
+  thenBranch: Stmt;
+  elseBranch: Stmt | null;
+
+  constructor(condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null) {
+    this.condition = condition;
+    this.thenBranch = thenBranch;
+    this.elseBranch = elseBranch;
+  }
+
+  accept(visitor: VisitorStmt): void {
+    return visitor.visitIfStmt(this);
   }
 }

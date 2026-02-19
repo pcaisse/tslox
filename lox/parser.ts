@@ -9,7 +9,14 @@ import {
   VariableExpr,
 } from "./expr";
 import { TokenType } from "./tokenType";
-import { BlockStmt, ExprStmt, PrintStmt, VarStmt, type Stmt } from "./stmt";
+import {
+  BlockStmt,
+  ExprStmt,
+  IfStmt,
+  PrintStmt,
+  VarStmt,
+  type Stmt,
+} from "./stmt";
 
 export class ParseError extends Error {
   token: Token;
@@ -56,9 +63,21 @@ export default class Parser {
   }
 
   #statement(): Stmt {
+    if (this.#match(TokenType.IF)) return this.#ifStatement();
     if (this.#match(TokenType.PRINT)) return this.#printStatement();
     if (this.#match(TokenType.LEFT_BRACE)) return new BlockStmt(this.#block());
     return this.#expressionStatement();
+  }
+
+  #ifStatement(): Stmt {
+    this.#consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+    const condition = this.#expression();
+    this.#consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+
+    const thenBranch = this.#statement();
+    const elseBranch = this.#match(TokenType.ELSE) ? this.#statement() : null;
+
+    return new IfStmt(condition, thenBranch, elseBranch);
   }
 
   #printStatement(): PrintStmt {

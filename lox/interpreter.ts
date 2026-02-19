@@ -14,6 +14,7 @@ import type { Literal } from "./types";
 import type {
   BlockStmt,
   ExprStmt,
+  IfStmt,
   PrintStmt,
   Stmt,
   VarStmt,
@@ -158,6 +159,14 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
 
   visitExprStmt(stmt: ExprStmt): void {
     this.#evaluate(stmt.expression);
+  }
+
+  visitIfStmt(stmt: IfStmt): void {
+    if (this.#isTruthy(this.#evaluate(stmt.condition))) {
+      this.#execute(stmt.thenBranch);
+    } else if (stmt.elseBranch !== null) {
+      this.#execute(stmt.elseBranch);
+    }
   }
 
   visitPrintStmt(stmt: PrintStmt): void {
