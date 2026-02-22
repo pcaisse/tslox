@@ -8,6 +8,7 @@ export interface VisitorExpr {
   visitLiteralExpr: (literal: LiteralExpr) => Literal;
   visitUnaryExpr: (unary: UnaryExpr) => Literal;
   visitVariableExpr: (unary: VariableExpr) => Literal;
+  visitLogicalExpr: (binary: LogicalExpr) => Literal;
 }
 
 export abstract class Expr {
@@ -91,5 +92,21 @@ export class VariableExpr implements Expr {
 
   accept(visitor: VisitorExpr): Literal {
     return visitor.visitVariableExpr(this);
+  }
+}
+
+export class LogicalExpr implements Expr {
+  left: Expr;
+  operator: Token;
+  right: Expr;
+
+  constructor(left: Expr, operator: Token, right: Expr) {
+    this.left = left;
+    this.operator = operator;
+    this.right = right;
+  }
+
+  accept(visitor: VisitorExpr): Literal {
+    return visitor.visitLogicalExpr(this);
   }
 }

@@ -5,6 +5,7 @@ import type {
   Expr,
   GroupingExpr,
   LiteralExpr,
+  LogicalExpr,
   UnaryExpr,
   VariableExpr,
   VisitorExpr,
@@ -102,6 +103,18 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
 
   visitLiteralExpr(expr: LiteralExpr) {
     return expr.value;
+  }
+
+  visitLogicalExpr(expr: LogicalExpr) {
+    const left = this.#evaluate(expr.left);
+
+    if (expr.operator.type === TokenType.OR) {
+      if (this.#isTruthy(left)) return left;
+    } else {
+      if (!this.#isTruthy(left)) return left;
+    }
+
+    return this.#evaluate(expr.right);
   }
 
   visitUnaryExpr(expr: UnaryExpr): Literal {
