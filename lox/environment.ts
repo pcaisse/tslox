@@ -17,7 +17,7 @@ export default class Environment {
   get(name: Token): Literal {
     const value = this.#values.get(name.lexeme);
 
-    if (value) {
+    if (value !== undefined) {
       return value;
     }
 
