@@ -85,12 +85,12 @@ export default class Parser {
       initializer = this.#expressionStatement();
     }
 
-    const condition = this.#check(TokenType.SEMICOLON)
+    const condition = !this.#check(TokenType.SEMICOLON)
       ? this.#expression()
       : null;
     this.#consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
 
-    const increment = this.#check(TokenType.RIGHT_PAREN)
+    const increment = !this.#check(TokenType.RIGHT_PAREN)
       ? this.#expression()
       : null;
     this.#consume(TokenType.RIGHT_PAREN, "Expect ')' after 'for'.");
