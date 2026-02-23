@@ -66,10 +66,54 @@ export default class Parser {
 
   #statement(): Stmt {
     if (this.#match(TokenType.IF)) return this.#ifStatement();
+    if (this.#match(TokenType.FOR)) return this.#forStatement();
     if (this.#match(TokenType.PRINT)) return this.#printStatement();
     if (this.#match(TokenType.WHILE)) return this.#whileStatement();
     if (this.#match(TokenType.LEFT_BRACE)) return new BlockStmt(this.#block());
     return this.#expressionStatement();
+  }
+
+  #forStatement(): Stmt {
+    this.#consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+
+    let initializer: Stmt | null;
+    if (this.#match(TokenType.SEMICOLON)) {
+      initializer = null;
+    } else if (this.#match(TokenType.VAR)) {
+      initializer = this.#varDeclaration();
+    } else {
+      initializer = this.#expressionStatement();
+    }
+
+    const condition = this.#check(TokenType.SEMICOLON)
+      ? this.#expression()
+      : null;
+    this.#consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
+
+    const increment = this.#check(TokenType.RIGHT_PAREN)
+      ? this.#expression()
+      : null;
+    this.#consume(TokenType.RIGHT_PAREN, "Expect ')' after 'for'.");
+
+    const body = this.#statement();
+
+    const bodyWithIncrement =
+      increment !== null
+        ? new BlockStmt([body, new ExprStmt(increment)])
+        : // default increment is no-op
+          body;
+
+    const finalBody =
+      initializer !== null
+        ? new BlockStmt([initializer, bodyWithIncrement])
+        : // default initializer is no-op
+          bodyWithIncrement;
+
+    return new WhileStmt(
+      // default condition is true
+      condition || new LiteralExpr(true),
+      finalBody,
+    );
   }
 
   #ifStatement(): Stmt {
