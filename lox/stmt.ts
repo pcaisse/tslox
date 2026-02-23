@@ -7,6 +7,7 @@ export interface VisitorStmt {
   visitVarStmt: (stmt: VarStmt) => void;
   visitBlockStmt: (stmt: BlockStmt) => void;
   visitIfStmt: (stmt: IfStmt) => void;
+  visitWhileStmt: (stmt: WhileStmt) => void;
 }
 
 export abstract class Stmt {
@@ -76,5 +77,19 @@ export class IfStmt implements Stmt {
 
   accept(visitor: VisitorStmt): void {
     return visitor.visitIfStmt(this);
+  }
+}
+
+export class WhileStmt implements Stmt {
+  condition: Expr;
+  body: Stmt;
+
+  constructor(condition: Expr, body: Stmt) {
+    this.condition = condition;
+    this.body = body;
+  }
+
+  accept(visitor: VisitorStmt): void {
+    return visitor.visitWhileStmt(this);
   }
 }

@@ -20,6 +20,7 @@ import type {
   Stmt,
   VarStmt,
   VisitorStmt,
+  WhileStmt,
 } from "./stmt";
 import Environment from "./environment";
 
@@ -191,6 +192,12 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
     const value =
       stmt.initializer !== null ? this.#evaluate(stmt.initializer) : null;
     this.#environment.define(stmt.name.lexeme, value);
+  }
+
+  visitWhileStmt(stmt: WhileStmt): void {
+    while (this.#isTruthy(this.#evaluate(stmt.condition))) {
+      this.#execute(stmt.body);
+    }
   }
 
   visitAssignExpr(expr: AssignExpr): Literal {
