@@ -2,6 +2,7 @@ import Token from "./token";
 import {
   AssignExpr,
   BinaryExpr,
+  CallExpr,
   Expr,
   GroupingExpr,
   LiteralExpr,
@@ -275,7 +276,37 @@ export default class Parser {
       return new UnaryExpr(operator, right);
     }
 
-    return this.#primary();
+    return this.#call();
+  }
+
+  #finishCall(callee: Expr) {
+    const args: Expr[] = [];
+    if (!this.#check(TokenType.RIGHT_PAREN)) {
+      do {
+        args.push(this.#expression());
+      } while (this.#match(TokenType.COMMA));
+    }
+
+    const paren = this.#consume(
+      TokenType.RIGHT_PAREN,
+      "Expect ')' after arguments.",
+    );
+
+    return new CallExpr(callee, paren, args);
+  }
+
+  #call(): Expr {
+    let expr = this.#primary();
+
+    while (true) {
+      if (this.#match(TokenType.LEFT_PAREN)) {
+        expr = this.#finishCall(expr);
+      } else {
+        break;
+      }
+    }
+
+    return expr;
   }
 
   #primary(): Expr {

@@ -4,11 +4,12 @@ import type { Literal } from "./types";
 export interface VisitorExpr {
   visitAssignExpr: (assign: AssignExpr) => Literal;
   visitBinaryExpr: (binary: BinaryExpr) => Literal;
+  visitCallExpr: (call: CallExpr) => Literal;
   visitGroupingExpr: (grouping: GroupingExpr) => Literal;
   visitLiteralExpr: (literal: LiteralExpr) => Literal;
+  visitLogicalExpr: (binary: LogicalExpr) => Literal;
   visitUnaryExpr: (unary: UnaryExpr) => Literal;
   visitVariableExpr: (unary: VariableExpr) => Literal;
-  visitLogicalExpr: (binary: LogicalExpr) => Literal;
 }
 
 export abstract class Expr {
@@ -108,5 +109,21 @@ export class LogicalExpr implements Expr {
 
   accept(visitor: VisitorExpr): Literal {
     return visitor.visitLogicalExpr(this);
+  }
+}
+
+export class CallExpr implements Expr {
+  callee: Expr;
+  paren: Token;
+  args: Expr[];
+
+  constructor(callee: Expr, paren: Token, args: Expr[]) {
+    this.callee = callee;
+    this.paren = paren;
+    this.args = args;
+  }
+
+  accept(visitor: VisitorExpr): Literal {
+    return visitor.visitCallExpr(this);
   }
 }
