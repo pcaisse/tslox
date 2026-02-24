@@ -103,17 +103,19 @@ export default class Parser {
         : // default increment is no-op
           body;
 
-    const finalBody =
-      initializer !== null
-        ? new BlockStmt([initializer, bodyWithIncrement])
-        : // default initializer is no-op
-          bodyWithIncrement;
-
-    return new WhileStmt(
+    const whileStatement = new WhileStmt(
       // default condition is true
       condition || new LiteralExpr(true),
-      finalBody,
+      bodyWithIncrement,
     );
+
+    const finalBody =
+      initializer !== null
+        ? new BlockStmt([initializer, whileStatement])
+        : // default initializer is no-op
+          whileStatement;
+
+    return finalBody;
   }
 
   #ifStatement(): Stmt {
