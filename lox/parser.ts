@@ -283,6 +283,9 @@ export default class Parser {
     const args: Expr[] = [];
     if (!this.#check(TokenType.RIGHT_PAREN)) {
       do {
+        if (args.length >= 255) {
+          this.#error(this.#peek(), "Can't have more than 255 arguments.");
+        }
         args.push(this.#expression());
       } while (this.#match(TokenType.COMMA));
     }

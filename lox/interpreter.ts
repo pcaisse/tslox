@@ -2,6 +2,7 @@ import Token from "./token";
 import type {
   AssignExpr,
   BinaryExpr,
+  CallExpr,
   Expr,
   GroupingExpr,
   LiteralExpr,
@@ -23,6 +24,7 @@ import type {
   WhileStmt,
 } from "./stmt";
 import Environment from "./environment";
+import LoxCallable from "./callable";
 
 export class RuntimeError extends Error {
   token: Token;
@@ -96,6 +98,28 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
 
     // Unreachable.
     return null;
+  }
+
+  visitCallExpr(expr: CallExpr) {
+    const callee = this.#evaluate(expr.callee);
+
+    const args = [];
+    for (const arg of expr.args) {
+      args.push(this.#evaluate(arg));
+    }
+
+    if (!(callee instanceof LoxCallable)) {
+      throw new RuntimeError("Can only call functions and classes", expr.paren);
+    }
+
+    if (args.length !== callee.arity) {
+      throw new RuntimeError(
+        "Expected " + callee.arity + " arguments but got " + args.length + ".",
+        expr.paren,
+      );
+    }
+
+    return callee.call(this, args);
   }
 
   visitGroupingExpr(expr: GroupingExpr) {
