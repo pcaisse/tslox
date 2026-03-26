@@ -24,7 +24,7 @@ import type {
   WhileStmt,
 } from "./stmt";
 import Environment from "./environment";
-import LoxCallable from "./callable";
+import LoxCallable, { ClockCallable } from "./callable";
 
 export class RuntimeError extends Error {
   token: Token;
@@ -36,11 +36,13 @@ export class RuntimeError extends Error {
 }
 
 export default class Interpreter implements VisitorExpr, VisitorStmt {
-  #environment: Environment = new Environment();
+  globals: Environment = new Environment();
+  #environment = this.globals;
   runtimeError: (error: RuntimeError) => void;
 
   constructor(runtimeError: (error: RuntimeError) => void) {
     this.runtimeError = runtimeError;
+    this.globals.define("clock", new ClockCallable());
   }
 
   interpret(statements: Stmt[]): void {
@@ -112,9 +114,13 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
       throw new RuntimeError("Can only call functions and classes", expr.paren);
     }
 
-    if (args.length !== callee.arity) {
+    if (args.length !== callee.arity()) {
       throw new RuntimeError(
-        "Expected " + callee.arity + " arguments but got " + args.length + ".",
+        "Expected " +
+          callee.arity() +
+          " arguments but got " +
+          args.length +
+          ".",
         expr.paren,
       );
     }
