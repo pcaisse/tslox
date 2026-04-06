@@ -8,6 +8,7 @@ export interface VisitorStmt {
   visitBlockStmt: (stmt: BlockStmt) => void;
   visitIfStmt: (stmt: IfStmt) => void;
   visitWhileStmt: (stmt: WhileStmt) => void;
+  visitFunctionStmt: (stmt: FunctionStmt) => void;
 }
 
 export abstract class Stmt {
@@ -91,5 +92,21 @@ export class WhileStmt implements Stmt {
 
   accept(visitor: VisitorStmt): void {
     return visitor.visitWhileStmt(this);
+  }
+}
+
+export class FunctionStmt implements Stmt {
+  name: Token;
+  params: Token[];
+  body: Stmt[];
+
+  constructor(name: Token, params: Token[], body: Stmt[]) {
+    this.name = name;
+    this.params = params;
+    this.body = body;
+  }
+
+  accept(visitor: VisitorStmt): void {
+    return visitor.visitFunctionStmt(this);
   }
 }
