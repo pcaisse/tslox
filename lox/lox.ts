@@ -7,12 +7,12 @@ export default class Lox {
   hadError = false;
   hadRuntimeError = false;
 
-  constructor() {
-    if (arguments.length > 1) {
+  constructor(args: string[]) {
+    if (args.length > 3) {
       console.log("Usage: tslox [script]");
       process.exit(64);
-    } else if (arguments.length === 1) {
-      this.#runFile(arguments[0]);
+    } else if (args[2]) {
+      this.#runFile(args[2]);
     } else {
       this.#runPrompt();
     }

@@ -1,3 +1,3 @@
 import Lox from "./lox/lox";
 
-new Lox();
+new Lox(Bun.argv);
