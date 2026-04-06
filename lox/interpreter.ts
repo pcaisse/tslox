@@ -16,6 +16,7 @@ import type { Literal } from "./types";
 import type {
   BlockStmt,
   ExprStmt,
+  FunctionStmt,
   IfStmt,
   PrintStmt,
   Stmt,
@@ -25,6 +26,7 @@ import type {
 } from "./stmt";
 import Environment from "./environment";
 import LoxCallable, { ClockCallable } from "./callable";
+import LoxFunction from "./function";
 
 export class RuntimeError extends Error {
   token: Token;
@@ -185,7 +187,7 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
     statement.accept(this);
   }
 
-  #executeBlock(statements: Stmt[], environment: Environment): void {
+  executeBlock(statements: Stmt[], environment: Environment): void {
     const previous = this.#environment;
     try {
       this.#environment = environment;
@@ -198,11 +200,16 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
   }
 
   visitBlockStmt(stmt: BlockStmt): void {
-    this.#executeBlock(stmt.statements, new Environment(this.#environment));
+    this.executeBlock(stmt.statements, new Environment(this.#environment));
   }
 
   visitExprStmt(stmt: ExprStmt): void {
     this.#evaluate(stmt.expression);
+  }
+
+  visitFunctionStmt(stmt: FunctionStmt): void {
+    const func = new LoxFunction(stmt);
+    this.#environment.define(stmt.name.lexeme, func);
   }
 
   visitIfStmt(stmt: IfStmt): void {
