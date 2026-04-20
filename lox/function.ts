@@ -7,12 +7,14 @@ import type { Literal } from "./types";
 
 export default class LoxFunction implements LoxCallable {
   #declaration: FunctionStmt;
-  constructor(declaration: FunctionStmt) {
+  #closure: Environment;
+  constructor(declaration: FunctionStmt, closure: Environment) {
     this.#declaration = declaration;
+    this.#closure = closure;
   }
 
   call(interpreter: Interpreter, args: Literal[]): Literal {
-    const environment = new Environment(interpreter.globals);
+    const environment = new Environment(this.#closure);
     this.#declaration.params.forEach((value, i) => {
       environment.define(value.lexeme, args[i] as Literal);
     });
