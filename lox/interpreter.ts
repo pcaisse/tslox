@@ -13,20 +13,22 @@ import type {
 } from "./expr";
 import { TokenType } from "./tokenType";
 import type { Literal } from "./types";
-import type {
-  BlockStmt,
-  ExprStmt,
-  FunctionStmt,
-  IfStmt,
-  PrintStmt,
-  Stmt,
-  VarStmt,
-  VisitorStmt,
-  WhileStmt,
+import {
+  ReturnStmt,
+  type BlockStmt,
+  type ExprStmt,
+  type FunctionStmt,
+  type IfStmt,
+  type PrintStmt,
+  type Stmt,
+  type VarStmt,
+  type VisitorStmt,
+  type WhileStmt,
 } from "./stmt";
 import Environment from "./environment";
-import LoxCallable, { ClockCallable } from "./callable";
+import { ClockCallable } from "./callable";
 import LoxFunction from "./function";
+import Return from "./return";
 
 export class RuntimeError extends Error {
   token: Token;
@@ -112,8 +114,11 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
       args.push(this.#evaluate(arg));
     }
 
-    if (!(callee instanceof LoxCallable)) {
-      throw new RuntimeError("Can only call functions and classes", expr.paren);
+    if (!(callee instanceof LoxFunction)) {
+      throw new RuntimeError(
+        "Can only call functions and classes, not " + callee,
+        expr.paren,
+      );
     }
 
     if (args.length !== callee.arity()) {
@@ -223,6 +228,11 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
   visitPrintStmt(stmt: PrintStmt): void {
     const value = this.#evaluate(stmt.expression);
     console.log(value);
+  }
+
+  visitReturnStmt(stmt: ReturnStmt): void {
+    const value = stmt.value !== null ? this.#evaluate(stmt.value) : stmt.value;
+    throw new Return(value);
   }
 
   visitVarStmt(stmt: VarStmt): void {

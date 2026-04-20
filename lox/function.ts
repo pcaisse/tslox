@@ -1,6 +1,7 @@
 import type LoxCallable from "./callable";
 import Environment from "./environment";
 import type Interpreter from "./interpreter";
+import Return from "./return";
 import type { FunctionStmt } from "./stmt";
 import type { Literal } from "./types";
 
@@ -16,7 +17,14 @@ export default class LoxFunction implements LoxCallable {
       environment.define(value.lexeme, args[i] as Literal);
     });
 
-    interpreter.executeBlock(this.#declaration.body, environment);
+    try {
+      interpreter.executeBlock(this.#declaration.body, environment);
+    } catch (maybeReturn) {
+      if (maybeReturn instanceof Return) {
+        return maybeReturn.value;
+      }
+      throw maybeReturn;
+    }
     return null;
   }
 
