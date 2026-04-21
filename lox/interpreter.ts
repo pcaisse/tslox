@@ -29,20 +29,13 @@ import Environment from "./environment";
 import { ClockCallable } from "./callable";
 import LoxFunction from "./function";
 import Return from "./return";
-
-export class RuntimeError extends Error {
-  token: Token;
-
-  constructor(message: string, token: Token) {
-    super(message);
-    this.token = token;
-  }
-}
+import { RuntimeError } from "./error";
 
 export default class Interpreter implements VisitorExpr, VisitorStmt {
   globals: Environment = new Environment();
   #environment = this.globals;
   runtimeError: (error: RuntimeError) => void;
+  #locals: Map<Expr, number> = new Map();
 
   constructor(runtimeError: (error: RuntimeError) => void) {
     this.runtimeError = runtimeError;
@@ -171,7 +164,15 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
   }
 
   visitVariableExpr(expr: VariableExpr): Literal {
-    return this.#environment.get(expr.name);
+    return this.#lookUpVariable(expr.name, expr);
+  }
+
+  #lookUpVariable(name: Token, expr: Expr) {
+    const distance: number | undefined = this.#locals.get(expr);
+    if (distance !== undefined) {
+      return this.#environment.getAt(distance, name.lexeme);
+    }
+    return this.globals.get(name);
   }
 
   #checkNumberOperand(operator: Token, operand: Literal) {
@@ -190,6 +191,10 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
 
   #execute(statement: Stmt) {
     statement.accept(this);
+  }
+
+  resolve(expr: Expr, depth: number) {
+    this.#locals.set(expr, depth);
   }
 
   executeBlock(statements: Stmt[], environment: Environment): void {
@@ -249,7 +254,12 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
 
   visitAssignExpr(expr: AssignExpr): Literal {
     const value = this.#evaluate(expr.value);
-    this.#environment.assign(expr.name, value);
+    const distance = this.#locals.get(expr);
+    if (distance !== undefined) {
+      this.#environment.assignAt(distance, expr.name, value);
+    } else {
+      this.globals.assign(expr.name, value);
+    }
     return value;
   }
 

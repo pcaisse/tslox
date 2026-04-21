@@ -1,5 +1,7 @@
-import Interpreter, { RuntimeError } from "./interpreter";
+import type { RuntimeError } from "./error";
+import Interpreter from "./interpreter";
 import Parser from "./parser";
+import Resolver from "./resolver";
 import Scanner from "./scanner";
 
 export default class Lox {
@@ -42,6 +44,11 @@ export default class Lox {
     const parser = new Parser(tokens, this.#error);
     const statements = parser.parse();
     if (this.hadError) return;
+
+    const resolver = new Resolver(this.interpreter, this.#error);
+    if (this.hadError) return;
+
+    resolver.resolve(statements);
     this.interpreter.interpret(statements);
   }
 

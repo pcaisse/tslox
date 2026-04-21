@@ -1,4 +1,4 @@
-import { RuntimeError } from "./interpreter";
+import { RuntimeError } from "./error";
 import Token from "./token";
 import type { Literal } from "./types";
 
@@ -12,6 +12,23 @@ export default class Environment {
 
   define(name: string, value: Literal): void {
     this.#values.set(name, value);
+  }
+
+  #ancestor(distance: number) {
+    let environment: Environment = this;
+    for (let i = 0; i < distance; i++) {
+      if (environment.enclosing === undefined) break;
+      environment = environment.enclosing;
+    }
+    return environment;
+  }
+
+  getAt(distance: number, name: string) {
+    return this.#ancestor(distance).#values.get(name);
+  }
+
+  assignAt(distance: number, name: Token, value: Literal) {
+    this.#ancestor(distance).#values.set(name.lexeme, value);
   }
 
   get(name: Token): Literal {
