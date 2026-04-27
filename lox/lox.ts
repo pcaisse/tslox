@@ -40,6 +40,8 @@ export default class Lox {
 
   #run(source: string): void {
     const scanner = new Scanner(source, this.#error);
+    if (this.hadError) return;
+
     const tokens = scanner.scanTokens();
     const parser = new Parser(tokens, this.#error);
     const statements = parser.parse();

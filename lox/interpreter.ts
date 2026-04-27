@@ -164,7 +164,11 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
   }
 
   visitVariableExpr(expr: VariableExpr): Literal {
-    return this.#lookUpVariable(expr.name, expr);
+    const variable = this.#lookUpVariable(expr.name, expr);
+    if (variable === undefined) {
+      throw new Error(`Unable to look up variable '${expr.name}'`);
+    }
+    return variable;
   }
 
   #lookUpVariable(name: Token, expr: Expr) {

@@ -403,7 +403,6 @@ export default class Parser {
       if (this.#previous().type == TokenType.SEMICOLON) return;
 
       switch (this.#peek().type) {
-        case TokenType.CLASS:
         case TokenType.FUN:
         case TokenType.VAR:
         case TokenType.FOR:
