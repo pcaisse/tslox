@@ -1,5 +1,5 @@
-import type Interpreter from "./interpreter";
-import type { Literal } from "./types";
+import type Interpreter from "./interpreter.ts";
+import type { Literal } from "./types.ts";
 
 export default abstract class LoxCallable {
   abstract arity: () => number;

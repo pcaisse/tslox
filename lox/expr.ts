@@ -1,5 +1,5 @@
-import Token from "./token";
-import type { Literal } from "./types";
+import Token from "./token.ts";
+import type { Literal } from "./types.ts";
 
 export interface VisitorExpr {
   visitAssignExpr: (assign: AssignExpr) => Literal;

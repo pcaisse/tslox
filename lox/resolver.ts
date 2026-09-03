@@ -9,9 +9,9 @@ import {
   UnaryExpr,
   VariableExpr,
   type VisitorExpr,
-} from "./expr";
-import Token from "./token";
-import type Interpreter from "./interpreter";
+} from "./expr.ts";
+import Token from "./token.ts";
+import type Interpreter from "./interpreter.ts";
 import type {
   BlockStmt,
   ExprStmt,
@@ -23,9 +23,9 @@ import type {
   VarStmt,
   VisitorStmt,
   WhileStmt,
-} from "./stmt";
-import { RuntimeError } from "./error";
-import { TokenType } from "./tokenType";
+} from "./stmt.ts";
+import { RuntimeError } from "./error.ts";
+import { TOKEN_TYPE } from "./tokenType.ts";
 
 type FunctionType = "function" | "none";
 
@@ -46,7 +46,7 @@ export default class Resolver implements VisitorExpr, VisitorStmt {
   #error(token: Token, message: string) {
     this.#report(
       token.line,
-      token.type === TokenType.EOF ? " at end" : " at '" + token.lexeme + "'",
+      token.type === TOKEN_TYPE.EOF ? " at end" : " at '" + token.lexeme + "'",
       message,
     );
   }

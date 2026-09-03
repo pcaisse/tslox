@@ -1,5 +1,6 @@
-import Token from "./token";
-import { TokenType } from "./tokenType";
+import Token from "./token.ts";
+import { TOKEN_TYPE } from "./tokenType.ts";
+import type { TokenType } from "./tokenType.ts";
 
 export default class Scanner {
   #source: string;
@@ -9,20 +10,20 @@ export default class Scanner {
   #current = 0;
   #line = 1;
 
-  #keywords: Map<String, TokenType> = new Map([
-    ["and", TokenType.AND],
-    ["else", TokenType.ELSE],
-    ["false", TokenType.FALSE],
-    ["for", TokenType.FOR],
-    ["fun", TokenType.FUN],
-    ["if", TokenType.IF],
-    ["nil", TokenType.NIL],
-    ["or", TokenType.OR],
-    ["print", TokenType.PRINT],
-    ["return", TokenType.RETURN],
-    ["true", TokenType.TRUE],
-    ["var", TokenType.VAR],
-    ["while", TokenType.WHILE],
+  #keywords: Map<keyof typeof TOKEN_TYPE, TokenType> = new Map([
+    ["AND", TOKEN_TYPE.AND],
+    ["ELSE", TOKEN_TYPE.ELSE],
+    ["FALSE", TOKEN_TYPE.FALSE],
+    ["FOR", TOKEN_TYPE.FOR],
+    ["FUN", TOKEN_TYPE.FUN],
+    ["IF", TOKEN_TYPE.IF],
+    ["NIL", TOKEN_TYPE.NIL],
+    ["OR", TOKEN_TYPE.OR],
+    ["PRINT", TOKEN_TYPE.PRINT],
+    ["RETURN", TOKEN_TYPE.RETURN],
+    ["TRUE", TOKEN_TYPE.TRUE],
+    ["VAR", TOKEN_TYPE.VAR],
+    ["WHILE", TOKEN_TYPE.WHILE],
   ]);
 
   constructor(
@@ -40,7 +41,7 @@ export default class Scanner {
       this.#scanToken();
     }
 
-    this.#tokens.push(new Token(TokenType.EOF, "", null, this.#line));
+    this.#tokens.push(new Token(TOKEN_TYPE.EOF, "", null, this.#line));
     return this.#tokens;
   }
 
@@ -48,53 +49,53 @@ export default class Scanner {
     const c = this.#advance();
     switch (c) {
       case "(":
-        this.#addToken(TokenType.LEFT_PAREN);
+        this.#addToken(TOKEN_TYPE.LEFT_PAREN);
         break;
       case ")":
-        this.#addToken(TokenType.RIGHT_PAREN);
+        this.#addToken(TOKEN_TYPE.RIGHT_PAREN);
         break;
       case "{":
-        this.#addToken(TokenType.LEFT_BRACE);
+        this.#addToken(TOKEN_TYPE.LEFT_BRACE);
         break;
       case "}":
-        this.#addToken(TokenType.RIGHT_BRACE);
+        this.#addToken(TOKEN_TYPE.RIGHT_BRACE);
         break;
       case ",":
-        this.#addToken(TokenType.COMMA);
+        this.#addToken(TOKEN_TYPE.COMMA);
         break;
       case ".":
-        this.#addToken(TokenType.DOT);
+        this.#addToken(TOKEN_TYPE.DOT);
         break;
       case "-":
-        this.#addToken(TokenType.MINUS);
+        this.#addToken(TOKEN_TYPE.MINUS);
         break;
       case "+":
-        this.#addToken(TokenType.PLUS);
+        this.#addToken(TOKEN_TYPE.PLUS);
         break;
       case ";":
-        this.#addToken(TokenType.SEMICOLON);
+        this.#addToken(TOKEN_TYPE.SEMICOLON);
         break;
       case "*":
-        this.#addToken(TokenType.STAR);
+        this.#addToken(TOKEN_TYPE.STAR);
         break;
       case "!":
         this.#addToken(
-          this.#match("=") ? TokenType.BANG_EQUAL : TokenType.BANG,
+          this.#match("=") ? TOKEN_TYPE.BANG_EQUAL : TOKEN_TYPE.BANG,
         );
         break;
       case "=":
         this.#addToken(
-          this.#match("=") ? TokenType.EQUAL_EQUAL : TokenType.EQUAL,
+          this.#match("=") ? TOKEN_TYPE.EQUAL_EQUAL : TOKEN_TYPE.EQUAL,
         );
         break;
       case "<":
         this.#addToken(
-          this.#match("=") ? TokenType.LESS_EQUAL : TokenType.LESS,
+          this.#match("=") ? TOKEN_TYPE.LESS_EQUAL : TOKEN_TYPE.LESS,
         );
         break;
       case ">":
         this.#addToken(
-          this.#match("=") ? TokenType.GREATER_EQUAL : TokenType.GREATER,
+          this.#match("=") ? TOKEN_TYPE.GREATER_EQUAL : TOKEN_TYPE.GREATER,
         );
         break;
       case "/":
@@ -102,7 +103,7 @@ export default class Scanner {
           // A comment goes until the end of the line.
           while (this.#peek() != "\n" && !this.#isAtEnd()) this.#advance();
         } else {
-          this.#addToken(TokenType.SLASH);
+          this.#addToken(TOKEN_TYPE.SLASH);
         }
         break;
       case " ":
@@ -132,9 +133,11 @@ export default class Scanner {
   #identifier(): void {
     while (this.#isAlphaNumeric(this.#peek())) this.#advance();
 
-    const text: string = this.#source.substring(this.#start, this.#current);
-    let type = this.#keywords.get(text);
-    if (type === undefined) type = TokenType.IDENTIFIER;
+    const text = this.#source
+      .substring(this.#start, this.#current)
+      .toUpperCase();
+    let type = this.#keywords.get(text as keyof typeof TOKEN_TYPE);
+    if (type === undefined) type = TOKEN_TYPE.IDENTIFIER;
     this.#addToken(type);
   }
 
@@ -150,7 +153,7 @@ export default class Scanner {
     }
 
     this.#addToken(
-      TokenType.NUMBER,
+      TOKEN_TYPE.NUMBER,
       parseFloat(this.#source.substring(this.#start, this.#current)),
     );
   }
@@ -171,7 +174,7 @@ export default class Scanner {
 
     // Trim the surrounding quotes.
     const value = this.#source.substring(this.#start + 1, this.#current - 1);
-    this.#addToken(TokenType.STRING, value);
+    this.#addToken(TOKEN_TYPE.STRING, value);
   }
 
   #match(expected: string) {

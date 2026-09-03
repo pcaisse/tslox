@@ -1,3 +1,3 @@
-import Lox from "./lox/lox";
+import Lox from "./lox/lox.ts";
 
-new Lox(Bun.argv);
+new Lox(process.argv);

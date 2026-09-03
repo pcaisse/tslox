@@ -1,9 +1,9 @@
-import type LoxCallable from "./callable";
-import Environment from "./environment";
-import type Interpreter from "./interpreter";
-import Return from "./return";
-import type { FunctionStmt } from "./stmt";
-import type { Literal } from "./types";
+import type LoxCallable from "./callable.ts";
+import Environment from "./environment.ts";
+import type Interpreter from "./interpreter.ts";
+import Return from "./return.ts";
+import type { FunctionStmt } from "./stmt.ts";
+import type { Literal } from "./types.ts";
 
 export default class LoxFunction implements LoxCallable {
   #declaration: FunctionStmt;

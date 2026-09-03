@@ -1,4 +1,4 @@
-import Token from "./token";
+import Token from "./token.ts";
 import type {
   AssignExpr,
   BinaryExpr,
@@ -10,9 +10,9 @@ import type {
   UnaryExpr,
   VariableExpr,
   VisitorExpr,
-} from "./expr";
-import { TokenType } from "./tokenType";
-import type { Literal } from "./types";
+} from "./expr.ts";
+import { TOKEN_TYPE } from "./tokenType.ts";
+import type { Literal } from "./types.ts";
 import {
   ReturnStmt,
   type BlockStmt,
@@ -24,12 +24,12 @@ import {
   type VarStmt,
   type VisitorStmt,
   type WhileStmt,
-} from "./stmt";
-import Environment from "./environment";
-import { ClockCallable } from "./callable";
-import LoxFunction from "./function";
-import Return from "./return";
-import { RuntimeError } from "./error";
+} from "./stmt.ts";
+import Environment from "./environment.ts";
+import { ClockCallable } from "./callable.ts";
+import LoxFunction from "./function.ts";
+import Return from "./return.ts";
+import { RuntimeError } from "./error.ts";
 
 export default class Interpreter implements VisitorExpr, VisitorStmt {
   globals: Environment = new Environment();
@@ -57,22 +57,22 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
     const right = this.#evaluate(expr.right);
 
     switch (expr.operator.type) {
-      case TokenType.GREATER:
+      case TOKEN_TYPE.GREATER:
         this.#checkNumberOperands(expr.operator, left, right);
         return (left as number) > (right as number);
-      case TokenType.GREATER_EQUAL:
+      case TOKEN_TYPE.GREATER_EQUAL:
         this.#checkNumberOperands(expr.operator, left, right);
         return (left as number) >= (right as number);
-      case TokenType.LESS:
+      case TOKEN_TYPE.LESS:
         this.#checkNumberOperands(expr.operator, left, right);
         return (left as number) < (right as number);
-      case TokenType.LESS_EQUAL:
+      case TOKEN_TYPE.LESS_EQUAL:
         this.#checkNumberOperands(expr.operator, left, right);
         return (left as number) <= (right as number);
-      case TokenType.MINUS:
+      case TOKEN_TYPE.MINUS:
         this.#checkNumberOperands(expr.operator, left, right);
         return (left as number) - (right as number);
-      case TokenType.PLUS:
+      case TOKEN_TYPE.PLUS:
         if (typeof left === "number" && typeof right === "number") {
           return left + right;
         }
@@ -83,15 +83,15 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
           "Operands must be two numbers or two strings.",
           expr.operator,
         );
-      case TokenType.SLASH:
+      case TOKEN_TYPE.SLASH:
         this.#checkNumberOperands(expr.operator, left, right);
         return (left as number) / (right as number);
-      case TokenType.STAR:
+      case TOKEN_TYPE.STAR:
         this.#checkNumberOperands(expr.operator, left, right);
         return (left as number) * (right as number);
-      case TokenType.BANG_EQUAL:
+      case TOKEN_TYPE.BANG_EQUAL:
         return !this.#isEqual(left, right);
-      case TokenType.EQUAL_EQUAL:
+      case TOKEN_TYPE.EQUAL_EQUAL:
         return this.#isEqual(left, right);
     }
 
@@ -139,7 +139,7 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
   visitLogicalExpr(expr: LogicalExpr) {
     const left = this.#evaluate(expr.left);
 
-    if (expr.operator.type === TokenType.OR) {
+    if (expr.operator.type === TOKEN_TYPE.OR) {
       if (this.#isTruthy(left)) return left;
     } else {
       if (!this.#isTruthy(left)) return left;
@@ -152,9 +152,9 @@ export default class Interpreter implements VisitorExpr, VisitorStmt {
     const right = this.#evaluate(expr.right);
 
     switch (expr.operator.type) {
-      case TokenType.BANG:
+      case TOKEN_TYPE.BANG:
         return !this.#isTruthy(right);
-      case TokenType.MINUS:
+      case TOKEN_TYPE.MINUS:
         this.#checkNumberOperand(expr.operator, right);
         return -(right as number);
     }

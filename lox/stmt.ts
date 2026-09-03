@@ -1,5 +1,5 @@
-import Token from "./token";
-import type { Expr } from "./expr";
+import Token from "./token.ts";
+import type { Expr } from "./expr.ts";
 
 export interface VisitorStmt {
   visitExprStmt: (stmt: ExprStmt) => void;

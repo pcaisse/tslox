@@ -1,8 +1,10 @@
-import type { RuntimeError } from "./error";
-import Interpreter from "./interpreter";
-import Parser from "./parser";
-import Resolver from "./resolver";
-import Scanner from "./scanner";
+import { readFile } from "node:fs/promises";
+
+import type { RuntimeError } from "./error.ts";
+import Interpreter from "./interpreter.ts";
+import Parser from "./parser.ts";
+import Resolver from "./resolver.ts";
+import Scanner from "./scanner.ts";
 
 export default class Lox {
   interpreter = new Interpreter(this.#runtimeError);
@@ -21,8 +23,7 @@ export default class Lox {
   }
 
   async #runFile(path: string) {
-    const file = Bun.file(path);
-    const text = await file.text();
+    const text = await readFile(path, "utf8");
     this.#run(text);
 
     // Indicate an error in the exit code.
@@ -31,10 +32,11 @@ export default class Lox {
   }
 
   async #runPrompt() {
-    Bun.stdout.write("> ");
-    for await (const input of console) {
+    process.stdin.setEncoding("utf8");
+    process.stdout.write("> ");
+    for await (const input of process.stdin) {
       this.#run(input);
-      Bun.stdout.write("> ");
+      process.stdout.write("> ");
     }
   }
 

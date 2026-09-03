@@ -9,22 +9,20 @@ The core language is implemented but classes and inheritance (ch. 12 & 13) are s
 To install dependencies:
 
 ```bash
-bun install
+npm install
 ```
 
 To run:
 
 ```bash
-bun run index.ts
+node index.ts
 ```
-
-This project was created using `bun init` in bun v1.3.1. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
 
 ## Examples
 
-To run examples, do `bun run index.ts <path_to_example_file>` like so:
+To run examples, do `node index.ts <path_to_example_file>` like so:
 ```
-$ bun run index.ts examples/counter.lox
+$ node index.ts examples/counter.lox
 1
 2
 ```

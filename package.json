@@ -1,12 +1,18 @@
 {
-  "name": "jlox",
+  "name": "tslox",
+  "version": "0.1.0",
+  "description": "An implemention of Lox in TypeScript",
   "module": "index.ts",
   "type": "module",
-  "private": true,
-  "devDependencies": {
-    "@types/bun": "latest"
+  "engines": {
+    "node": ">=23",
+    "npm": ">=10"
   },
-  "peerDependencies": {
+  "devDependencies": {
+    "@types/node": "^26.4.1",
     "typescript": "^5"
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
   }
 }

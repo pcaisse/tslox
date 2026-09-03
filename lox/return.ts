@@ -1,4 +1,4 @@
-import type { Literal } from "./types";
+import type { Literal } from "./types.ts";
 
 export default class Return extends Error {
   value: Literal;

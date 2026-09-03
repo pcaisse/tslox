@@ -1,6 +1,6 @@
-import { RuntimeError } from "./error";
-import Token from "./token";
-import type { Literal } from "./types";
+import { RuntimeError } from "./error.ts";
+import Token from "./token.ts";
+import type { Literal } from "./types.ts";
 
 export default class Environment {
   enclosing: Environment | undefined;
